@@ -1,20 +1,15 @@
+import './global.css';
+import './src/i18n';
+
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { AppProviders } from '@/src/app';
+import { MarketScreen } from '@/src/features/market';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+    <AppProviders>
       <StatusBar style="auto" />
-    </View>
+      <MarketScreen />
+    </AppProviders>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
