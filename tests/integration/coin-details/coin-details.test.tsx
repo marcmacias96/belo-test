@@ -5,6 +5,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { RootNavigator } from '@/src/navigation';
 import { CoinDetailsScreen } from '@/src/features/coin-details';
+import {
+  resetTransactionsStoreAndStorage,
+  useTransactionsStore,
+} from '@/src/features/swap/state/useTransactionsStore';
 import { renderWithAppShell } from '@/src/shared/test';
 import {
   coinHistoryEmpty,
@@ -67,6 +71,7 @@ describe('coin-details integration', () => {
     jest.clearAllMocks();
     globalThis.fetch = originalFetch;
     await resetWalletStoreAndStorage();
+    await resetTransactionsStoreAndStorage();
   });
 
   it('deberia mostrar el precio actual y spread bid/ask cuando los datos cargan correctamente', async () => {
@@ -89,13 +94,58 @@ describe('coin-details integration', () => {
     expect(screen.getByText('+2.45%')).toBeTruthy();
   });
 
-  it('deberia mostrar el historial de precios de las ultimas 24h cuando los datos cargan', async () => {
+  it('deberia mostrar el chart de precio y el estado vacio de transacciones cuando no hay swaps para la moneda', async () => {
     mockCoinSuccess();
 
     renderCoinDetailsScreen('bitcoin');
 
-    expect(await screen.findByTestId('coin-history-list')).toBeTruthy();
+    expect(await screen.findByTestId('coin-transactions-empty')).toBeTruthy();
     expect(screen.getByTestId('coin-history-chart')).toBeTruthy();
+  });
+
+  it('deberia mostrar las transacciones swap relacionadas a la moneda en CoinDetails', async () => {
+    mockCoinSuccess();
+    useTransactionsStore.setState({
+      transactions: [
+        {
+          id: 'tx-1',
+          fromId: 'bitcoin',
+          toId: 'ethereum',
+          fromAmount: 0.01,
+          toAmount: 0.3333,
+          priceIn: 100_000,
+          priceOut: 3_000,
+          executedAt: '2026-05-07T12:00:00.000Z',
+        },
+        {
+          id: 'tx-2',
+          fromId: 'usdt',
+          toId: 'bitcoin',
+          fromAmount: 500,
+          toAmount: 0.005,
+          priceIn: 1,
+          priceOut: 100_000,
+          executedAt: '2026-05-07T12:10:00.000Z',
+        },
+        {
+          id: 'tx-3',
+          fromId: 'usdc',
+          toId: 'dai',
+          fromAmount: 40,
+          toAmount: 40,
+          priceIn: 1,
+          priceOut: 1,
+          executedAt: '2026-05-07T12:20:00.000Z',
+        },
+      ],
+    });
+
+    renderCoinDetailsScreen('bitcoin');
+
+    expect(await screen.findByTestId('coin-transactions-list')).toBeTruthy();
+    expect(screen.getByText('0.0100 BTC -> 0.3333 ETH')).toBeTruthy();
+    expect(screen.getByText('500.0000 USDT -> 0.0050 BTC')).toBeTruthy();
+    expect(screen.queryByText('40.0000 USDC -> 40.0000 DAI')).toBeNull();
   });
 
   it('deberia mostrar skeleton mientras los datos de la moneda se obtienen', async () => {
@@ -154,8 +204,8 @@ describe('coin-details integration', () => {
     expect(await screen.findByTestId('coin-price-current')).toBeTruthy();
 
     // History empty state
-    expect(screen.getByTestId('coin-history-empty')).toBeTruthy();
-    expect(screen.getByText('No price history available for the last 24h.')).toBeTruthy();
+    expect(screen.getByTestId('coin-transactions-empty')).toBeTruthy();
+    expect(screen.getByText('No swap transactions yet for this coin.')).toBeTruthy();
 
     // Chart should not render when empty
     expect(screen.queryByTestId('coin-history-chart')).toBeNull();
