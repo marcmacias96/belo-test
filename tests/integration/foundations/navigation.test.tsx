@@ -41,6 +41,21 @@ describe('navigation foundations', () => {
     });
   });
 
+  it('deberia navegar a PriceAlerts desde el acceso rapido en Notifications', async () => {
+    renderWithAppShell(<RootNavigator />);
+
+    await screen.findByTestId('portfolio-screen');
+
+    fireEvent.press(screen.getByRole('button', { name: 'Open notifications' }));
+    await screen.findByTestId('notifications-list');
+
+    fireEvent.press(screen.getByRole('button', { name: 'Manage price alerts' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('price-alerts-screen')).toBeTruthy();
+    });
+  });
+
   it('deberia abrir CoinDetails con el coinId en params cuando se navega desde un stack interno', async () => {
     const { navigationRef } = renderWithAppShell(<RootNavigator />);
 

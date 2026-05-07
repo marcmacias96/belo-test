@@ -31,8 +31,8 @@ export function formatNotificationBody(n: Notification): string {
     const p = n.payload as PriceAlertPayload;
     return i18next.t('notifications:priceAlertBody', {
       symbol: p.symbol,
-      delta: (p.deltaPercent * (p.deltaPercent >= 0 ? 1 : -1)).toFixed(1),
-      threshold: (p.threshold * 100).toFixed(0),
+      delta: p.deltaPercent.toFixed(1),
+      threshold: p.thresholdPercent.toFixed(1),
     });
   }
   const _exhaustive: never = n;

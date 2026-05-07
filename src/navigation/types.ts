@@ -1,6 +1,7 @@
 export type RootStackParamList = {
   Home: undefined;
   Notifications: undefined;
+  PriceAlerts: undefined;
   CoinDetails: { coinId: string; name?: string; symbol?: string };
   Swap: { fromId?: string; toId?: string } | undefined;
 };

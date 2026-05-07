@@ -4,16 +4,20 @@ import { useEffect, useRef } from 'react';
 import { fetchPortfolioPrices } from '@/src/features/wallet/services/fetchPortfolioPrices';
 import { ASSET_METADATA } from '@/src/features/wallet/types';
 import type { AssetId } from '@/src/features/wallet/types';
+import { useToast } from '@/src/shared/hooks/useToast';
+import i18next from '@/src/i18n';
 
 import { computePriceDelta } from '../lib/computePriceDelta';
 import { useNotificationsStore } from '../state/useNotificationsStore';
-import { DEFAULT_THRESHOLD, usePriceAlertsStore } from '../state/usePriceAlertsStore';
+import { usePriceAlertsStore } from '../state/usePriceAlertsStore';
 
 export function usePriceAlertWatcher() {
   const add = useNotificationsStore((state) => state.add);
-  const priceSnapshots = usePriceAlertsStore((state) => state.priceSnapshots);
-  const updateSnapshot = usePriceAlertsStore((state) => state.updateSnapshot);
-  const getThreshold = usePriceAlertsStore((state) => state.getThreshold);
+  const { success } = useToast();
+  const getAlertsByAsset = usePriceAlertsStore((state) => state.getAlertsByAsset);
+  const setLatestPrice = usePriceAlertsStore((state) => state.setLatestPrice);
+  const initializeReferencePricesForAsset = usePriceAlertsStore((state) => state.initializeReferencePricesForAsset);
+  const updateAlertReferencePrice = usePriceAlertsStore((state) => state.updateAlertReferencePrice);
 
   // Track last processed data reference to avoid double-firing on the same fetch result
   const lastProcessedDataRef = useRef<unknown>(null);
@@ -39,36 +43,48 @@ export function usePriceAlertWatcher() {
     const assetIds = Object.keys(data) as AssetId[];
     for (const assetId of assetIds) {
       const currentPrice = data[assetId];
-      if (currentPrice === undefined) continue;
+      if (currentPrice === undefined || currentPrice <= 0) continue;
 
-      const snapshot = priceSnapshots[assetId];
+      setLatestPrice(assetId, currentPrice);
+      initializeReferencePricesForAsset(assetId, currentPrice);
 
-      if (snapshot === undefined) {
-        updateSnapshot(assetId, currentPrice);
-        continue;
-      }
+      const alerts = getAlertsByAsset(assetId);
+      for (const alert of alerts) {
+        if (alert.referencePrice === undefined || alert.referencePrice <= 0) {
+          continue;
+        }
 
-      const delta = computePriceDelta(currentPrice, snapshot);
-      const threshold = getThreshold(assetId) ?? DEFAULT_THRESHOLD;
+        const delta = computePriceDelta(currentPrice, alert.referencePrice);
+        const thresholdRatio = alert.thresholdPercent / 100;
 
-      if (Math.abs(delta) >= threshold) {
-        const meta = ASSET_METADATA[assetId as keyof typeof ASSET_METADATA];
-        const symbol = meta?.symbol ?? assetId.toUpperCase();
+        if (Math.abs(delta) >= thresholdRatio) {
+          const meta = ASSET_METADATA[assetId as keyof typeof ASSET_METADATA];
+          const symbol = meta?.symbol ?? assetId.toUpperCase();
 
-        add({
-          kind: 'price',
-          createdAt: new Date().toISOString(),
-          payload: {
-            assetId,
-            symbol,
-            deltaPercent: delta * 100,
-            threshold: threshold * 100,
-          },
-        });
+          add({
+            kind: 'price',
+            createdAt: new Date().toISOString(),
+            payload: {
+              alertId: alert.id,
+              assetId,
+              symbol,
+              deltaPercent: delta * 100,
+              thresholdPercent: alert.thresholdPercent,
+            },
+          });
 
-        // Update snapshot so next cycle measures from the new price,
-        // preventing consecutive alerts for the same oscillation.
-        updateSnapshot(assetId, currentPrice);
+          success(
+            i18next.t('notifications:priceAlertTitle', { symbol }),
+            i18next.t('notifications:priceAlertBody', {
+              symbol,
+              delta: (delta * 100).toFixed(1),
+              threshold: alert.thresholdPercent.toFixed(1),
+            }),
+          );
+
+          // Move baseline to current price to avoid duplicate alerts.
+          updateAlertReferencePrice(alert.id, currentPrice);
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -130,27 +130,35 @@ export function SwapScreen({ fromId: initFromId, toId: initToId }: SwapScreenPro
   function handleConfirm() {
     if (!canConfirm || !pricesQuery.data || toAmount === null) return;
 
-    const tx: Transaction = {
-      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-      fromId,
-      toId,
-      fromAmount: parsedAmount,
-      toAmount,
-      priceIn,
-      priceOut,
-      executedAt: new Date().toISOString(),
-    };
+    try {
+      const tx: Transaction = {
+        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        fromId,
+        toId,
+        fromAmount: parsedAmount,
+        toAmount,
+        priceIn,
+        priceOut,
+        executedAt: new Date().toISOString(),
+      };
 
-    applySwap({ fromId, toId, fromAmount: parsedAmount, toAmount });
-    addTransaction(tx);
-    swapEventEmitter.emit(tx);
+      applySwap({ fromId, toId, fromAmount: parsedAmount, toAmount });
+      addTransaction(tx);
+      swapEventEmitter.emit(tx);
 
-    toast({
-      title: 'Swap executed!',
-      description: `${parsedAmount} ${ASSET_METADATA[fromId].symbol} → ${toAmount.toFixed(6)} ${ASSET_METADATA[toId].symbol}`,
-    });
+      toast({
+        title: 'Swap executed!',
+        description: `${parsedAmount} ${ASSET_METADATA[fromId].symbol} → ${toAmount.toFixed(6)} ${ASSET_METADATA[toId].symbol}`,
+      });
 
-    setFromAmountText('');
+      setFromAmountText('');
+    } catch {
+      toast({
+        title: 'Swap failed',
+        description: 'Could not complete the swap.',
+        variant: 'destructive',
+      });
+    }
   }
 
   function handleBackPress() {

@@ -1,25 +1,27 @@
+import { Ionicons } from '@expo/vector-icons';
 import { NavigationContext } from '@react-navigation/native';
 import { useCallback, useContext } from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { CardContent, CardHeader, CardTitle, Card, Separator } from '@/components/ui';
+import { Card, CardHeader, CardTitle, Separator, Text } from '@/components/ui';
 import { ScreenBackHeader } from '@/src/app';
-import { ASSET_IDS } from '@/src/features/wallet/types';
+import { useTheme } from '@/src/app/providers/ThemeProvider';
 
 import {
   NotificationEmptyState,
   NotificationRow,
   NotificationsHeader,
-  PriceAlertThresholdRow,
 } from '../components';
 import { useNotificationsStore } from '../state/useNotificationsStore';
 import type { Notification } from '../types';
 
 export function NotificationsScreen() {
   const { t } = useTranslation('notifications');
+  const { effectiveMode } = useTheme();
   const navigation = useContext(NavigationContext);
   const notifications = useNotificationsStore((state) => state.notifications);
+  const trailingIconColor = effectiveMode === 'dark' ? '#94a3b8' : '#64748b';
 
   const keyExtractor = useCallback((item: Notification) => item.id, []);
   const renderItem = useCallback(
@@ -41,6 +43,14 @@ export function NotificationsScreen() {
     navigation.navigate('Home' as never);
   }, [navigation]);
 
+  const handleOpenPriceAlerts = useCallback(() => {
+    if (!navigation) {
+      return;
+    }
+
+    navigation.navigate('PriceAlerts' as never);
+  }, [navigation]);
+
   const ListHeaderComponent = useCallback(
     () => (
       <View className="gap-4 pb-3 pt-4">
@@ -51,15 +61,20 @@ export function NotificationsScreen() {
         />
         <NotificationsHeader />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t('alertThresholds')}</CardTitle>
+        <Card className="border-primary/15">
+          <CardHeader className="gap-3">
+            <CardTitle className="text-base">{t('priceAlertsShortcutTitle')}</CardTitle>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('managePriceAlerts')}
+              onPress={handleOpenPriceAlerts}
+              testID="open-price-alerts-button"
+              className="flex-row items-center justify-between rounded-md border border-primary/20 bg-secondary/70 px-3 py-3 active:bg-secondary"
+            >
+              <Text className="text-sm font-medium">{t('managePriceAlerts')}</Text>
+              <Ionicons name="chevron-forward" size={18} color={trailingIconColor} />
+            </Pressable>
           </CardHeader>
-          <CardContent className="gap-2 pb-3">
-            {ASSET_IDS.map((assetId) => (
-              <PriceAlertThresholdRow key={assetId} assetId={assetId} />
-            ))}
-          </CardContent>
         </Card>
 
         <Separator />
@@ -67,7 +82,7 @@ export function NotificationsScreen() {
         {notifications.length === 0 ? <NotificationEmptyState /> : null}
       </View>
     ),
-    [t, notifications.length, handleBackPress, navigation],
+    [t, notifications.length, handleBackPress, handleOpenPriceAlerts, navigation, trailingIconColor],
   );
 
   return (

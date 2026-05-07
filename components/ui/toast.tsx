@@ -60,13 +60,14 @@ export function Toaster() {
           key={t.id}
           className={cn(
             'pointer-events-auto mb-2 rounded-lg border px-4 py-3 shadow-md',
-            t.variant === 'default' && 'border-border bg-card',
+            t.variant === 'default' && 'border-primary/40 bg-primary',
             t.variant === 'destructive' && 'border-destructive bg-destructive',
           )}
         >
           <Text
             className={cn(
-              'font-semibold text-card-foreground',
+              'font-semibold',
+              t.variant === 'default' && 'text-primary-foreground',
               t.variant === 'destructive' && 'text-destructive-foreground',
             )}
           >
@@ -77,6 +78,7 @@ export function Toaster() {
               variant="subtitle"
               className={cn(
                 'mt-1',
+                t.variant === 'default' && 'text-primary-foreground/90',
                 t.variant === 'destructive' && 'text-destructive-foreground/90',
               )}
             >

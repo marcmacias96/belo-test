@@ -32,7 +32,7 @@ export function GlobalSafeArea({
   }, [edges, insets]);
 
   return (
-    <View style={paddingStyle} className={cn(className)}>
+    <View style={paddingStyle} className={cn('bg-background', className)}>
       {children}
     </View>
   );
