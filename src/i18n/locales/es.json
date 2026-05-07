@@ -1,0 +1,80 @@
+{
+  "common": {
+    "welcome": "¡Abre App.tsx para empezar a trabajar en tu app!",
+    "retry": "Reintentar",
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "empty": "Sin datos disponibles",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Cerrar"
+  },
+  "wallet": {
+    "title": "Portafolio",
+    "empty": "Aún no tienes activos en tu portafolio.",
+    "totalBalance": "Saldo Total",
+    "pnl": "P&G",
+    "loading": "Cargando portafolio...",
+    "error": "No se pudieron cargar los precios.",
+    "unavailable": "N/D",
+    "partialPrices": "* Parcial — algunos precios no disponibles"
+  },
+  "market": {
+    "title": "Mercado",
+    "searchPlaceholder": "Buscar por nombre o símbolo",
+    "sortLabel": "Ordenar",
+    "favoritesOnly": "Solo favoritos",
+    "showingFavorites": "Mostrando solo favoritos",
+    "noAssets": "No hay activos disponibles.",
+    "noResults": "Ningún activo coincide con los filtros.",
+    "error": "No se pudo cargar el mercado."
+  },
+  "coin": {
+    "title": "Detalle de Moneda",
+    "price": "Precio",
+    "volume": "Volumen 24h",
+    "marketCap": "Cap. de Mercado",
+    "change24h": "Cambio 24h",
+    "buy": "Compra (Ask)",
+    "sell": "Venta (Bid)",
+    "currentPrice": "Precio Actual",
+    "priceHistory": "Historial de Precios (24h)",
+    "priceChart": "Gráfico de Precios (24h)",
+    "loading": "Cargando datos de la moneda...",
+    "error": "No se pudieron cargar los datos.",
+    "historyEmpty": "Sin historial de precios para las últimas 24h."
+  },
+  "swap": {
+    "title": "Intercambio",
+    "from": "Desde",
+    "to": "Hasta",
+    "amount": "Cantidad",
+    "amountPlaceholder": "0.00",
+    "preview": "Previsualización",
+    "previewTitle": "Previsualizar Intercambio",
+    "confirm": "Confirmar Intercambio",
+    "slippage": "Deslizamiento",
+    "loading": "Cargando precios...",
+    "error": "No se pudieron cargar los precios del intercambio.",
+    "success": "¡Intercambio ejecutado!",
+    "outputAmount": "Recibes",
+    "conversionRate": "Tasa",
+    "valueUsd": "Valor (USD)",
+    "errorInsufficientBalance": "Saldo insuficiente",
+    "errorBelowMinUsd": "El mínimo es $1 USD",
+    "errorSameAsset": "Los activos de origen y destino deben ser diferentes",
+    "errorInvalidAmount": "Ingresa un monto válido"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "empty": "Sin notificaciones todavía.",
+    "markAllRead": "Marcar todas como leídas",
+    "alertThresholds": "Umbrales de Alerta de Precio",
+    "transactionTitle": "Intercambio Ejecutado",
+    "transactionBody": "Intercambiado {{fromAmount}} {{fromSymbol}} → {{toAmount}} {{toSymbol}}",
+    "priceAlertTitle": "Alerta de Precio: {{symbol}}",
+    "priceAlertBody": "{{symbol}} movió {{delta}}% (umbral: {{threshold}}%)",
+    "watcherError": "Alertas de precio temporalmente no disponibles.",
+    "unreadCount": "{{count}} sin leer"
+  }
+}

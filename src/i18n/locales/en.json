@@ -1,0 +1,80 @@
+{
+  "common": {
+    "welcome": "Open up App.tsx to start working on your app!",
+    "retry": "Retry",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "empty": "No data available",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close"
+  },
+  "wallet": {
+    "title": "Portfolio",
+    "empty": "No assets in your portfolio yet.",
+    "totalBalance": "Total Balance",
+    "pnl": "P&L",
+    "loading": "Loading portfolio...",
+    "error": "Could not load prices.",
+    "unavailable": "N/A",
+    "partialPrices": "* Partial — some prices unavailable"
+  },
+  "market": {
+    "title": "Market",
+    "searchPlaceholder": "Search by name or symbol",
+    "sortLabel": "Sort",
+    "favoritesOnly": "Show favorites only",
+    "showingFavorites": "Showing only favorites",
+    "noAssets": "No market assets available.",
+    "noResults": "No assets match current filters.",
+    "error": "Could not load market data."
+  },
+  "coin": {
+    "title": "Coin Details",
+    "price": "Price",
+    "volume": "24h Volume",
+    "marketCap": "Market Cap",
+    "change24h": "24h Change",
+    "buy": "Buy (Ask)",
+    "sell": "Sell (Bid)",
+    "currentPrice": "Current Price",
+    "priceHistory": "Price History (24h)",
+    "priceChart": "Price Chart (24h)",
+    "loading": "Loading coin data...",
+    "error": "Could not load coin data.",
+    "historyEmpty": "No price history available for the last 24h."
+  },
+  "swap": {
+    "title": "Swap",
+    "from": "From",
+    "to": "To",
+    "amount": "Amount",
+    "amountPlaceholder": "0.00",
+    "preview": "Preview",
+    "previewTitle": "Preview Swap",
+    "confirm": "Confirm Swap",
+    "slippage": "Slippage",
+    "loading": "Loading swap prices...",
+    "error": "Could not load swap prices.",
+    "success": "Swap executed!",
+    "outputAmount": "You receive",
+    "conversionRate": "Rate",
+    "valueUsd": "Value (USD)",
+    "errorInsufficientBalance": "Insufficient balance",
+    "errorBelowMinUsd": "Minimum swap is $1 USD",
+    "errorSameAsset": "From and To assets must be different",
+    "errorInvalidAmount": "Enter a valid amount"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet.",
+    "markAllRead": "Mark all as read",
+    "alertThresholds": "Price Alert Thresholds",
+    "transactionTitle": "Swap Executed",
+    "transactionBody": "Swapped {{fromAmount}} {{fromSymbol}} → {{toAmount}} {{toSymbol}}",
+    "priceAlertTitle": "Price Alert: {{symbol}}",
+    "priceAlertBody": "{{symbol}} moved {{delta}}% (threshold: {{threshold}}%)",
+    "watcherError": "Price alerts temporarily unavailable.",
+    "unreadCount": "{{count}} unread"
+  }
+}
