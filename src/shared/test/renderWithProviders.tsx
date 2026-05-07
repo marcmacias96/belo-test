@@ -1,3 +1,4 @@
+import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import {
   QueryClient,
   QueryClientProvider,
@@ -12,6 +13,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ToastProvider } from '@/components/ui/toast';
 import { GlobalSafeArea } from '@/src/app/layout';
+import { ThemeProvider } from '@/src/app/providers/ThemeProvider';
+import type { RootStackParamList } from '@/src/navigation/types';
 import '@/src/i18n';
 
 type WrappedRenderOptions = Omit<RenderOptions, 'wrapper'>;
@@ -60,4 +63,45 @@ export function renderWithProviders(
   };
 
   return rendered;
+}
+
+export type AppShellRenderAPI = RenderAPI & {
+  navigationRef: ReturnType<typeof createNavigationContainerRef<RootStackParamList>>;
+};
+
+export function renderWithAppShell(
+  ui: ReactElement,
+  options?: WrappedRenderOptions,
+): AppShellRenderAPI {
+  const queryClient = createTestQueryClient();
+  const navigationRef = createNavigationContainerRef<RootStackParamList>();
+
+  function AppShellProviders({ children }: PropsWithChildren) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <SafeAreaProvider>
+          <ThemeProvider>
+            <NavigationContainer ref={navigationRef}>
+              <GlobalSafeArea>
+                <ToastProvider>{children}</ToastProvider>
+              </GlobalSafeArea>
+            </NavigationContainer>
+          </ThemeProvider>
+        </SafeAreaProvider>
+      </QueryClientProvider>
+    );
+  }
+
+  const rendered = render(ui, {
+    wrapper: AppShellProviders,
+    ...options,
+  });
+
+  const originalUnmount = rendered.unmount;
+  rendered.unmount = () => {
+    originalUnmount();
+    queryClient.clear();
+  };
+
+  return { ...rendered, navigationRef };
 }
