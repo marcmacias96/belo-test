@@ -1,4 +1,5 @@
 import { useQueries } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { View } from 'react-native';
 
 import { Button, Card, CardContent, Text } from '@/components/ui';
@@ -11,11 +12,12 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   CoinDetailsSkeleton,
   CoinHistoryChart,
-  CoinHistoryList,
+  CoinTransactionsList,
   CoinPriceHeader,
 } from '../components';
 import { fetchCoinHistory } from '../services/fetchCoinHistory';
 import { fetchCoinPrice } from '../services/fetchCoinPrice';
+import { useTransactionsStore } from '@/src/features/swap/state/useTransactionsStore';
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -27,6 +29,14 @@ export function CoinDetailsScreen() {
   const { coinId, name, symbol } = route.params;
   const displayName = name ?? capitalize(coinId);
   const displaySymbol = symbol ?? coinId.toUpperCase();
+  const transactions = useTransactionsStore((state) => state.transactions);
+  const transactionsByCoin = useMemo(
+    () =>
+      transactions
+        .filter((transaction) => transaction.fromId === coinId || transaction.toId === coinId)
+        .sort((a, b) => new Date(b.executedAt).getTime() - new Date(a.executedAt).getTime()),
+    [coinId, transactions],
+  );
 
   const [priceQuery, historyQuery] = useQueries({
     queries: [
@@ -95,7 +105,7 @@ export function CoinDetailsScreen() {
           {historyQuery.data ? (
             <>
               <CoinHistoryChart points={historyQuery.data} />
-              <CoinHistoryList points={historyQuery.data} />
+              <CoinTransactionsList coinId={coinId} transactions={transactionsByCoin} />
             </>
           ) : null}
         </View>
