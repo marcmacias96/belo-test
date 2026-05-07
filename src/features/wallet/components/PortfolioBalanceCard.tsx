@@ -1,6 +1,7 @@
 import Animated from 'react-native-reanimated';
+import { View } from 'react-native';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { Text } from '@/components/ui/text';
 import { useFadeIn } from '@/src/shared/animations/useFadeIn';
 import { useCountUp } from '@/src/shared/animations/useCountUp';
@@ -20,14 +21,17 @@ export function PortfolioBalanceCard({ totalUsd, hasMissingPrices = false }: Por
 
   return (
     <Animated.View style={animatedStyle}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Total Balance</CardTitle>
+      <Card className="overflow-hidden rounded-2xl">
+        <CardHeader className="gap-3 border-b border-border/60 bg-primary/10 px-5 pb-4 pt-5">
+          <View className="flex-row items-center justify-between">
+            <CardTitle className="text-lg">Total Balance</CardTitle>
+          </View>
+          <Text variant="muted">Track your main crypto positions in USD</Text>
         </CardHeader>
-        <CardContent className="pb-4">
-          <Animated.View className="gap-1">
+        <CardContent className="gap-2 px-5 pb-5 pt-4">
+          <Animated.View className="gap-2">
             {totalUsd !== null ? (
-              <Text testID="portfolio-total-balance" variant="title">
+              <Text testID="portfolio-total-balance" variant="title" className="text-4xl">
                 {displayValue}
               </Text>
             ) : (
@@ -36,7 +40,7 @@ export function PortfolioBalanceCard({ totalUsd, hasMissingPrices = false }: Por
               </Text>
             )}
             {hasMissingPrices && totalUsd !== null ? (
-              <Text variant="muted">* Partial — some prices unavailable</Text>
+              <Text variant="muted">Some assets use the latest available quote.</Text>
             ) : null}
           </Animated.View>
         </CardContent>
