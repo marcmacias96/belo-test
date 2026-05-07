@@ -3,7 +3,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 
-import { NotificationsScreen } from '@/src/features/notifications';
+import { NotificationsScreen, PriceAlertsScreen } from '@/src/features/notifications';
 import {
   resetNotificationsStoreAndStorage,
   useNotificationsStore,
@@ -106,13 +106,13 @@ describe('notifications integration', () => {
   // -------------------------------------------------------------------------
 
   it('deberia disparar alerta de precio cuando el precio cambia mas del umbral configurado', async () => {
-    // Pre-populate snapshots with base prices (simulates previous fetch)
+    // Create one alert for BTC with a 5% threshold.
     act(() => {
-      usePriceAlertsStore.getState().updateSnapshot('bitcoin', 100_000);
-      usePriceAlertsStore.getState().updateSnapshot('ethereum', 3_000);
-      usePriceAlertsStore.getState().updateSnapshot('usdt', 1.0);
-      usePriceAlertsStore.getState().updateSnapshot('usdc', 1.0);
-      usePriceAlertsStore.getState().updateSnapshot('dai', 1.0);
+      usePriceAlertsStore.getState().setLatestPrice('bitcoin', 100_000);
+      usePriceAlertsStore.getState().createAlert({
+        assetId: 'bitcoin',
+        thresholdPercent: 5,
+      });
     });
 
     // Mock fetch to return +6% prices (above default 5% threshold)
@@ -130,8 +130,9 @@ describe('notifications integration', () => {
       expect(notifications.some((n) => n.kind === 'price')).toBe(true);
     });
 
-    // Price notification should be visible in the list
-    expect(await screen.findByText('Price Alert: BTC')).toBeTruthy();
+    // Price notification should be visible (list + toast can both render the same title)
+    const priceAlertTitles = await screen.findAllByText('Price Alert: BTC');
+    expect(priceAlertTitles.length).toBeGreaterThanOrEqual(1);
   });
 
   // -------------------------------------------------------------------------
@@ -139,13 +140,13 @@ describe('notifications integration', () => {
   // -------------------------------------------------------------------------
 
   it('deberia no disparar alerta de precio cuando el cambio es menor al umbral', async () => {
-    // Pre-populate snapshots with base prices
+    // Create one alert for BTC with a 5% threshold.
     act(() => {
-      usePriceAlertsStore.getState().updateSnapshot('bitcoin', 100_000);
-      usePriceAlertsStore.getState().updateSnapshot('ethereum', 3_000);
-      usePriceAlertsStore.getState().updateSnapshot('usdt', 1.0);
-      usePriceAlertsStore.getState().updateSnapshot('usdc', 1.0);
-      usePriceAlertsStore.getState().updateSnapshot('dai', 1.0);
+      usePriceAlertsStore.getState().setLatestPrice('bitcoin', 100_000);
+      usePriceAlertsStore.getState().createAlert({
+        assetId: 'bitcoin',
+        thresholdPercent: 5,
+      });
     });
 
     // Mock fetch to return +2% prices (below default 5% threshold)
@@ -176,18 +177,28 @@ describe('notifications integration', () => {
   // Test 4: threshold persists
   // -------------------------------------------------------------------------
 
-  it('deberia persistir el umbral de precio configurado por el usuario', async () => {
-    // Set a custom threshold for bitcoin (10%)
+  it('deberia persistir las alertas de precio configuradas por el usuario', async () => {
+    // Create one custom alert for bitcoin (10%).
     act(() => {
-      usePriceAlertsStore.getState().setThreshold('bitcoin', 0.1);
+      usePriceAlertsStore.getState().setLatestPrice('bitcoin', 100_000);
+      usePriceAlertsStore.getState().createAlert({
+        assetId: 'bitcoin',
+        thresholdPercent: 10,
+      });
     });
 
     // Verify written to AsyncStorage
     await waitFor(async () => {
       const raw = await AsyncStorage.getItem(PRICE_ALERTS_KEY);
       expect(raw).not.toBeNull();
-      const parsed = JSON.parse(raw!) as { state: { thresholds: Record<string, number> } };
-      expect(parsed.state.thresholds.bitcoin).toBeCloseTo(0.1, 5);
+      const parsed = JSON.parse(raw!) as {
+        state: {
+          alerts: Array<{ assetId: string; thresholdPercent: number }>;
+        };
+      };
+      expect(parsed.state.alerts).toHaveLength(1);
+      expect(parsed.state.alerts[0].assetId).toBe('bitcoin');
+      expect(parsed.state.alerts[0].thresholdPercent).toBeCloseTo(10, 5);
     });
 
     // Simulate rehydration (app restart)
@@ -195,8 +206,30 @@ describe('notifications integration', () => {
       await usePriceAlertsStore.persist.rehydrate();
     });
 
-    // Threshold should be restored
-    expect(usePriceAlertsStore.getState().thresholds.bitcoin).toBeCloseTo(0.1, 5);
+    // Alert should be restored
+    const restoredAlerts = usePriceAlertsStore.getState().alerts;
+    expect(restoredAlerts).toHaveLength(1);
+    expect(restoredAlerts[0].assetId).toBe('bitcoin');
+    expect(restoredAlerts[0].thresholdPercent).toBeCloseTo(10, 5);
+  });
+
+  it('deberia permitir crear y eliminar alertas de precio desde la pantalla', async () => {
+    renderWithProviders(<PriceAlertsScreen />);
+
+    const thresholdInput = await screen.findByTestId('new-price-alert-threshold-input');
+    fireEvent.changeText(thresholdInput, '7');
+    fireEvent.press(screen.getByTestId('create-price-alert-button'));
+
+    await waitFor(() => {
+      expect(usePriceAlertsStore.getState().alerts).toHaveLength(1);
+    });
+
+    const createdAlertId = usePriceAlertsStore.getState().alerts[0].id;
+    fireEvent.press(screen.getByTestId(`delete-price-alert-button-${createdAlertId}`));
+
+    await waitFor(() => {
+      expect(usePriceAlertsStore.getState().alerts).toHaveLength(0);
+    });
   });
 
   // -------------------------------------------------------------------------

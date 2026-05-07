@@ -52,10 +52,11 @@ export const NOTIFICATION_FIXTURES = {
     createdAt: '2026-05-07T12:01:00.000Z',
     read: false,
     payload: {
+      alertId: 'price-alert-001',
       assetId: 'bitcoin',
       symbol: 'BTC',
       deltaPercent: 6,
-      threshold: 5,
+      thresholdPercent: 5,
     },
   } satisfies Notification,
 };

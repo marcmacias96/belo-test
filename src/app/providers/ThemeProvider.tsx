@@ -1,5 +1,6 @@
-import { createContext, useContext, type PropsWithChildren } from 'react';
-import { useColorScheme, View } from 'react-native';
+import { createContext, useContext, useEffect, type PropsWithChildren } from 'react';
+import { StyleSheet, useColorScheme as useNativeWindColorScheme } from 'nativewind';
+import { View } from 'react-native';
 
 import { createPersistedStore, resetPersistedStorage } from '@/src/shared/state/persist';
 
@@ -33,17 +34,23 @@ export type ThemeContextValue = ThemeState & { effectiveMode: 'light' | 'dark' }
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: PropsWithChildren) {
-  const systemScheme = useColorScheme();
+  const { colorScheme, setColorScheme } = useNativeWindColorScheme();
   const mode = useThemeStore((s) => s.mode);
   const setMode = useThemeStore((s) => s.setMode);
   const toggle = useThemeStore((s) => s.toggle);
 
+  useEffect(() => {
+    const darkModeFlag = StyleSheet.getFlag('darkMode') ?? 'media';
+    if (darkModeFlag === 'media') return;
+    setColorScheme(mode === 'system' ? 'system' : mode);
+  }, [mode, setColorScheme]);
+
   const effectiveMode: 'light' | 'dark' =
-    mode === 'system' ? (systemScheme ?? 'light') : mode;
+    mode === 'system' ? (colorScheme ?? 'light') : mode;
 
   return (
     <ThemeContext.Provider value={{ mode, effectiveMode, setMode, toggle }}>
-      <View className={`flex-1${effectiveMode === 'dark' ? ' dark' : ''}`}>
+      <View className={`flex-1 bg-background${effectiveMode === 'dark' ? ' dark' : ''}`}>
         {children}
       </View>
     </ThemeContext.Provider>

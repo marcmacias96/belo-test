@@ -3,9 +3,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, View } from 'react-native';
 
 import { CoinDetailsScreen } from '@/src/features/coin-details';
-import { NotificationBadge, NotificationsScreen, useNotificationsStore } from '@/src/features/notifications';
+import {
+  NotificationBadge,
+  NotificationsScreen,
+  PriceAlertsScreen,
+  useNotificationsStore,
+} from '@/src/features/notifications';
 import { SwapScreen } from '@/src/features/swap';
 import { PortfolioScreen } from '@/src/features/wallet';
+import { useTheme } from '@/src/app/providers/ThemeProvider';
 
 import type { RootStackParamList } from './types';
 
@@ -22,9 +28,10 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 type HomeHeaderNotificationsButtonProps = {
   onPress: () => void;
+  iconColor: string;
 };
 
-function HomeHeaderNotificationsButton({ onPress }: HomeHeaderNotificationsButtonProps) {
+function HomeHeaderNotificationsButton({ onPress, iconColor }: HomeHeaderNotificationsButtonProps) {
   const unreadCount = useNotificationsStore(
     (state) => state.notifications.filter((notification) => !notification.read).length,
   );
@@ -38,7 +45,7 @@ function HomeHeaderNotificationsButton({ onPress }: HomeHeaderNotificationsButto
       className="mr-2"
     >
       <View className="relative h-9 w-9 items-center justify-center">
-        <Ionicons name="notifications-outline" size={20} color="#111827" />
+        <Ionicons name="notifications-outline" size={20} color={iconColor} />
         <NotificationBadge count={unreadCount} />
       </View>
     </Pressable>
@@ -46,16 +53,23 @@ function HomeHeaderNotificationsButton({ onPress }: HomeHeaderNotificationsButto
 }
 
 export function RootNavigator() {
+  const { effectiveMode } = useTheme();
+  const isDark = effectiveMode === 'dark';
+  const backgroundColor = isDark ? '#0f172a' : '#ffffff';
+  const foregroundColor = isDark ? '#f8fafc' : '#111827';
+
   return (
     <Stack.Navigator
       screenOptions={{
         headerTitleAlign: 'left',
         headerShadowVisible: false,
-        headerStyle: { backgroundColor: '#ffffff' },
+        headerStyle: { backgroundColor },
+        contentStyle: { backgroundColor },
+        headerTintColor: foregroundColor,
         headerTitleStyle: {
           fontSize: 34,
           fontWeight: '700',
-          color: '#111827',
+          color: foregroundColor,
         },
       }}
     >
@@ -65,11 +79,15 @@ export function RootNavigator() {
         options={({ navigation }) => ({
           title: 'Portafolio',
           headerRight: () => (
-            <HomeHeaderNotificationsButton onPress={() => navigation.navigate('Notifications')} />
+            <HomeHeaderNotificationsButton
+              iconColor={foregroundColor}
+              onPress={() => navigation.navigate('Notifications')}
+            />
           ),
         })}
       />
       <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="PriceAlerts" component={PriceAlertsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="CoinDetails" component={CoinDetailsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Swap" component={SwapScreenWrapper} options={{ headerShown: false }} />
     </Stack.Navigator>

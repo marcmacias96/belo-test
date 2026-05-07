@@ -34,16 +34,16 @@ export function AppProviders({ children }: PropsWithChildren) {
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
         <ErrorBoundary>
-          <ThemeProvider>
-            <NavigationContainer>
+          <NavigationContainer>
+            <ThemeProvider>
               <GlobalSafeArea>
                 <ToastProvider>
                   <NotificationsBootstrap />
                   {children}
                 </ToastProvider>
               </GlobalSafeArea>
-            </NavigationContainer>
-          </ThemeProvider>
+            </ThemeProvider>
+          </NavigationContainer>
         </ErrorBoundary>
       </SafeAreaProvider>
     </QueryClientProvider>

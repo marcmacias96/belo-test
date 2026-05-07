@@ -43,9 +43,11 @@ export function renderWithProviders(
     return (
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
-          <GlobalSafeArea>
-            <ToastProvider>{children}</ToastProvider>
-          </GlobalSafeArea>
+          <ThemeProvider>
+            <GlobalSafeArea>
+              <ToastProvider>{children}</ToastProvider>
+            </GlobalSafeArea>
+          </ThemeProvider>
         </SafeAreaProvider>
       </QueryClientProvider>
     );

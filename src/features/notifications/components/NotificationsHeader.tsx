@@ -19,7 +19,7 @@ export function NotificationsHeader() {
   }, [markAllRead]);
 
   return (
-    <Card>
+    <Card className="border-primary/15">
       <CardHeader className="gap-3">
         <View className="flex-row items-center justify-between gap-2">
           <View className="flex-row items-center gap-2">

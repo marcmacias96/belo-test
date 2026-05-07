@@ -13,17 +13,25 @@ export type TransactionPayload = {
 };
 
 export type PriceAlertPayload = {
+  alertId: string;
   assetId: string;
   symbol: string;
   deltaPercent: number;
-  threshold: number;
+  thresholdPercent: number;
+};
+
+export type PriceAlert = {
+  id: string;
+  assetId: AssetId;
+  thresholdPercent: number;
+  referencePrice?: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Notification =
   | { id: string; kind: 'transaction'; createdAt: string; read: boolean; payload: TransactionPayload }
   | { id: string; kind: 'price'; createdAt: string; read: boolean; payload: PriceAlertPayload };
-
-export type PriceAlertThresholds = Record<AssetId, number>;
 
 export type NotificationsState = {
   notifications: Notification[];
