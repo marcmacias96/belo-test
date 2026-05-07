@@ -1,2 +1,4 @@
 export { MARKET_FIXTURES } from './fixtures/market';
-export { renderWithProviders } from './renderWithProviders';
+export { NOTIFICATION_FIXTURES } from './fixtures/notifications';
+export { WALLET_FIXTURES } from './fixtures/wallet';
+export { renderWithAppShell, renderWithProviders } from './renderWithProviders';

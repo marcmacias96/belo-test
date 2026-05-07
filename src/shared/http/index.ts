@@ -1,2 +1,2 @@
-export { getJson } from './client';
+export { coingeckoFetch, fetchWithTimeout, getJson } from './client';
 export { HttpClientError } from './errors';
