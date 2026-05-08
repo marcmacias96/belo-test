@@ -16,9 +16,9 @@ const COINGECKO_ID_TO_ASSET_ID: Record<string, AssetId> = {
   dai: 'dai',
 };
 
-export async function fetchPortfolioPrices(): Promise<PriceMap> {
+export async function fetchPortfolioPrices(signal?: AbortSignal): Promise<PriceMap> {
   const endpoint = `${COINGECKO_API_BASE}/simple/price?ids=${COINGECKO_IDS}&vs_currencies=usd`;
-  const response = await coingeckoFetch(endpoint, { maxRetries: 0 });
+  const response = await coingeckoFetch(endpoint, { maxRetries: 0, signal });
 
   if (!response.ok) {
     throw new Error(`CoinGecko error: ${response.status}`);

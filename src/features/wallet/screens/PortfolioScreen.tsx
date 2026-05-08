@@ -46,7 +46,7 @@ export function PortfolioScreen() {
 
   const pricesQuery = useQuery({
     queryKey: ['wallet', 'prices'],
-    queryFn: fetchPortfolioPrices,
+    queryFn: ({ signal }) => fetchPortfolioPrices(signal),
     retry: false,
     enabled: !isEmpty,
   });

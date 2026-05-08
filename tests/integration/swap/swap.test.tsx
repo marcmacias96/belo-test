@@ -12,7 +12,7 @@ import {
   useWalletStore,
 } from '@/src/features/wallet/state/useWalletStore';
 import { swapEventEmitter } from '@/src/shared/events/swapEvents';
-import { renderWithProviders } from '@/src/shared/test';
+import { actAsync, renderWithProviders } from '@/src/shared/test';
 import { SWAP_FIXTURES } from '@/src/shared/test/fixtures/swap';
 
 // ---------------------------------------------------------------------------
@@ -45,16 +45,16 @@ describe('swap integration', () => {
   const originalFetch = globalThis.fetch;
 
   beforeEach(async () => {
-    await resetWalletStoreAndStorage();
-    await resetTransactionsStoreAndStorage();
+    await actAsync(async () => {
+      await resetWalletStoreAndStorage();
+      await resetTransactionsStoreAndStorage();
+    });
     swapEventEmitter._reset();
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
     globalThis.fetch = originalFetch;
-    await resetWalletStoreAndStorage();
-    await resetTransactionsStoreAndStorage();
     swapEventEmitter._reset();
   });
 

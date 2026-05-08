@@ -57,7 +57,7 @@ export function MarketScreen() {
   const favoriteAssetIds = useMarketPreferencesStore((state) => state.favoriteAssetIds);
   const marketQuery = useQuery({
     queryKey: ['market', 'assets'],
-    queryFn: fetchMarketAssets,
+    queryFn: ({ signal }) => fetchMarketAssets(signal),
     retry: false,
   });
 

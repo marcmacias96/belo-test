@@ -38,15 +38,21 @@ export function Toaster() {
   const [toasts, setToasts] = React.useState<ToastRecord[]>([]);
 
   React.useEffect(() => {
+    const dismissTimeouts = new Set<ReturnType<typeof setTimeout>>();
+
     const listener = (entry: ToastRecord) => {
       setToasts((prev) => [...prev, entry]);
-      setTimeout(() => {
+      const tid = setTimeout(() => {
+        dismissTimeouts.delete(tid);
         setToasts((prev) => prev.filter((t) => t.id !== entry.id));
       }, 3800);
+      dismissTimeouts.add(tid);
     };
     toastListeners.add(listener);
     return () => {
       toastListeners.delete(listener);
+      dismissTimeouts.forEach((tid) => clearTimeout(tid));
+      dismissTimeouts.clear();
     };
   }, []);
 

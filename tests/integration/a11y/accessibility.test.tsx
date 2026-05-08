@@ -11,7 +11,7 @@ import {
 } from '@/src/features/wallet/state/useWalletStore';
 import { resetTransactionsStoreAndStorage } from '@/src/features/swap/state/useTransactionsStore';
 import { WALLET_FIXTURES } from '@/src/shared/test/fixtures/wallet';
-import { renderWithProviders, renderWithAppShell } from '@/src/shared/test';
+import { actAsync, renderWithProviders, renderWithAppShell } from '@/src/shared/test';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -38,15 +38,15 @@ describe('a11y integration', () => {
   const originalFetch = globalThis.fetch;
 
   beforeEach(async () => {
-    await resetWalletStoreAndStorage();
-    await resetTransactionsStoreAndStorage();
+    await actAsync(async () => {
+      await resetWalletStoreAndStorage();
+      await resetTransactionsStoreAndStorage();
+    });
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
     globalThis.fetch = originalFetch;
-    await resetWalletStoreAndStorage();
-    await resetTransactionsStoreAndStorage();
   });
 
   // -------------------------------------------------------------------------

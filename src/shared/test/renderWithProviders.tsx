@@ -24,7 +24,9 @@ function createTestQueryClient() {
     defaultOptions: {
       queries: {
         retry: false,
-        gcTime: Infinity,
+        gcTime: 0,
+        staleTime: 0,
+        refetchOnWindowFocus: false,
       },
       mutations: {
         retry: false,
@@ -60,6 +62,7 @@ export function renderWithProviders(
 
   const originalUnmount = rendered.unmount;
   rendered.unmount = () => {
+    void queryClient.cancelQueries({ cancelRefetch: true });
     originalUnmount();
     queryClient.clear();
   };
@@ -101,6 +104,7 @@ export function renderWithAppShell(
 
   const originalUnmount = rendered.unmount;
   rendered.unmount = () => {
+    void queryClient.cancelQueries({ cancelRefetch: true });
     originalUnmount();
     queryClient.clear();
   };

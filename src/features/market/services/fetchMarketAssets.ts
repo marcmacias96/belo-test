@@ -12,7 +12,7 @@ type CoinGeckoMarketCoin = {
 
 const MARKET_IDS = 'bitcoin,ethereum,solana,polkadot,dogecoin';
 
-export async function fetchMarketAssets(): Promise<MarketAsset[]> {
+export async function fetchMarketAssets(signal?: AbortSignal): Promise<MarketAsset[]> {
   const query = new URLSearchParams({
     vs_currency: 'usd',
     ids: MARKET_IDS,
@@ -23,7 +23,7 @@ export async function fetchMarketAssets(): Promise<MarketAsset[]> {
   });
 
   const endpoint = `${COINGECKO_API_BASE}/coins/markets?${query.toString()}`;
-  const payload = await getJson<CoinGeckoMarketCoin[]>(endpoint);
+  const payload = await getJson<CoinGeckoMarketCoin[]>(endpoint, undefined, { signal, maxRetries: 0 });
 
   return payload.map((coin) => ({
     id: coin.id,
