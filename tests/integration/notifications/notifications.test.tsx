@@ -15,7 +15,7 @@ import {
 import { usePriceAlertWatcher } from '@/src/features/notifications/services/priceAlertWatcher';
 import { useSwapNotificationBridge } from '@/src/features/notifications/services/useSwapNotificationBridge';
 import { swapEventEmitter } from '@/src/shared/events/swapEvents';
-import { renderWithProviders } from '@/src/shared/test';
+import { actAsync, renderWithProviders } from '@/src/shared/test';
 import { NOTIFICATION_FIXTURES } from '@/src/shared/test/fixtures/notifications';
 
 // ---------------------------------------------------------------------------
@@ -54,16 +54,16 @@ describe('notifications integration', () => {
   const originalFetch = globalThis.fetch;
 
   beforeEach(async () => {
-    await resetNotificationsStoreAndStorage();
-    await resetPriceAlertsStoreAndStorage();
+    await actAsync(async () => {
+      await resetNotificationsStoreAndStorage();
+      await resetPriceAlertsStoreAndStorage();
+    });
     swapEventEmitter._reset();
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
     globalThis.fetch = originalFetch;
-    await resetNotificationsStoreAndStorage();
-    await resetPriceAlertsStoreAndStorage();
     swapEventEmitter._reset();
   });
 

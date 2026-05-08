@@ -67,7 +67,7 @@ export function SwapScreen({ fromId: initFromId, toId: initToId }: SwapScreenPro
 
   const pricesQuery = useQuery({
     queryKey: ['swap', 'prices', fromId, toId],
-    queryFn: () => fetchSwapPrices(fromId, toId),
+    queryFn: ({ signal }) => fetchSwapPrices(fromId, toId, signal),
     staleTime: 5_000,
     retry: false,
   });

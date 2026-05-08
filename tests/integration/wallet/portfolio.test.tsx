@@ -9,7 +9,7 @@ import {
   resetWalletStoreAndStorage,
   useWalletStore,
 } from '@/src/features/wallet/state/useWalletStore';
-import { renderWithProviders } from '@/src/shared/test';
+import { actAsync, renderWithProviders } from '@/src/shared/test';
 import { WALLET_FIXTURES } from '@/src/shared/test/fixtures/wallet';
 
 type MockFetchResponse = {
@@ -30,13 +30,12 @@ describe('wallet portfolio integration', () => {
   const originalFetch = globalThis.fetch;
 
   beforeEach(async () => {
-    await resetWalletStoreAndStorage();
+    await actAsync(() => resetWalletStoreAndStorage());
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
     globalThis.fetch = originalFetch;
-    await resetWalletStoreAndStorage();
   });
 
   it('deberia mostrar el balance total en USD cuando los precios cargan correctamente', async () => {

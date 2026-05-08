@@ -9,7 +9,7 @@ import {
   resetTransactionsStoreAndStorage,
   useTransactionsStore,
 } from '@/src/features/swap/state/useTransactionsStore';
-import { renderWithAppShell } from '@/src/shared/test';
+import { actAsync, renderWithAppShell } from '@/src/shared/test';
 import {
   coinHistoryEmpty,
   coinHistorySuccess,
@@ -67,11 +67,16 @@ function renderCoinDetailsScreen(coinId: string) {
 describe('coin-details integration', () => {
   const originalFetch = globalThis.fetch;
 
-  afterEach(async () => {
+  beforeEach(async () => {
+    await actAsync(async () => {
+      await resetWalletStoreAndStorage();
+      await resetTransactionsStoreAndStorage();
+    });
+  });
+
+  afterEach(() => {
     jest.clearAllMocks();
     globalThis.fetch = originalFetch;
-    await resetWalletStoreAndStorage();
-    await resetTransactionsStoreAndStorage();
   });
 
   it('deberia mostrar el precio actual y spread bid/ask cuando los datos cargan correctamente', async () => {

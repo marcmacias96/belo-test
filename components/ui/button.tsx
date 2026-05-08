@@ -5,7 +5,7 @@ import { Pressable, View, type PressableProps } from 'react-native';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'flex flex-row items-center justify-center rounded-md active:opacity-90',
+  'flex flex-row items-center justify-center rounded-md active:opacity-90 disabled:opacity-60 disabled:bg-muted',
   {
     variants: {
       variant: {
@@ -36,10 +36,11 @@ export type ButtonProps = PressableProps &
   };
 
 export const Button = React.forwardRef<View, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => (
+  ({ className, variant, size, disabled, ...props }, ref) => (
     <Pressable
       ref={ref}
       className={cn(buttonVariants({ variant, size }), className)}
+      disabled={disabled}
       {...props}
     />
   ),

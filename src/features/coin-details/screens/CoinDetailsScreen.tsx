@@ -42,13 +42,13 @@ export function CoinDetailsScreen() {
     queries: [
       {
         queryKey: ['coin', coinId, 'price'],
-        queryFn: () => fetchCoinPrice(coinId),
+        queryFn: ({ signal }) => fetchCoinPrice(coinId, signal),
         staleTime: 30_000,
         retry: false,
       },
       {
         queryKey: ['coin', coinId, 'history'],
-        queryFn: () => fetchCoinHistory(coinId),
+        queryFn: ({ signal }) => fetchCoinHistory(coinId, signal),
         staleTime: 30_000,
         retry: false,
       },

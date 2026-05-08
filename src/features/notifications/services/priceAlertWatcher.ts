@@ -26,7 +26,7 @@ export function usePriceAlertWatcher() {
 
   const { data } = useQuery({
     queryKey: ['price-alert-watcher'],
-    queryFn: fetchPortfolioPrices,
+    queryFn: ({ signal }) => fetchPortfolioPrices(signal),
     // Disable polling interval in test environment to prevent timer leaks.
     refetchInterval: isTest ? false : 60_000,
     refetchIntervalInBackground: false,

@@ -43,8 +43,9 @@ describe('App', () => {
 
     await screen.findByTestId('portfolio-screen');
 
-    const notificationsTab = screen.getByLabelText('Notifications, tab, 2 of 2');
-    fireEvent.press(notificationsTab);
+    // Bottom tabs were removed; navigation uses a header button.
+    const notificationsButton = screen.getByRole('button', { name: 'Open notifications' });
+    fireEvent.press(notificationsButton);
 
     await waitFor(() => {
       expect(screen.getByTestId('notifications-list')).toBeTruthy();

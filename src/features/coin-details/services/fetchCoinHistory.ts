@@ -16,7 +16,7 @@ function toCoinGeckoId(coinId: string): string {
   return COINGECKO_ID_ALIASES[coinId] ?? coinId;
 }
 
-export async function fetchCoinHistory(coinId: string): Promise<CoinHistoryPoint[]> {
+export async function fetchCoinHistory(coinId: string, signal?: AbortSignal): Promise<CoinHistoryPoint[]> {
   const resolvedCoinId = toCoinGeckoId(coinId);
   const query = new URLSearchParams({
     vs_currency: 'usd',
@@ -25,7 +25,7 @@ export async function fetchCoinHistory(coinId: string): Promise<CoinHistoryPoint
   });
 
   const endpoint = `${COINGECKO_API_BASE}/coins/${resolvedCoinId}/market_chart?${query.toString()}`;
-  const response = await coingeckoFetch(endpoint, { maxRetries: 0 });
+  const response = await coingeckoFetch(endpoint, { maxRetries: 0, signal });
 
   if (!response.ok) {
     throw new Error(`CoinGecko error: ${response.status}`);

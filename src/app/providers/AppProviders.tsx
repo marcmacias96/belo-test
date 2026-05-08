@@ -17,14 +17,21 @@ function NotificationsBootstrap() {
   return null;
 }
 
+const isJest = process.env.NODE_ENV === 'test';
+
 export function AppProviders({ children }: PropsWithChildren) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
         defaultOptions: {
           queries: {
-            retry: 2,
-            staleTime: 30_000,
+            retry: isJest ? false : 2,
+            staleTime: isJest ? 0 : 30_000,
+            gcTime: isJest ? 0 : undefined,
+            refetchOnWindowFocus: !isJest,
+          },
+          mutations: {
+            retry: isJest ? false : undefined,
           },
         },
       }),
